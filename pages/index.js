@@ -1,9 +1,10 @@
 import Head from "next/head";
 import { useState } from "react";
 import styles from "./index.module.css";
+import { FaFilm } from "react-icons/fa";
 
 export default function Home() {
-  const [animalInput, setAnimalInput] = useState("");
+  const [movieInput, setMovieInput] = useState("");
   const [result, setResult] = useState();
 
   async function onSubmit(event) {
@@ -14,7 +15,7 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ animal: animalInput }),
+        body: JSON.stringify({ movie: movieInput }),
       });
 
       const data = await response.json();
@@ -23,7 +24,7 @@ export default function Home() {
       }
 
       setResult(data.result);
-      setAnimalInput("");
+      setMovieInput("");
     } catch(error) {
       // Consider implementing your own error handling logic here
       console.error(error);
@@ -37,21 +38,20 @@ export default function Home() {
         <title>GPT Powered Generator</title>
         <link rel="icon" href="/dog.png" />
       </Head>
-
       <main className={styles.main}>
-        <img src="/dog.png" className={styles.icon} />
-        <h3>Name my pet a Superhero</h3>
+       <FaFilm id="icon"/>
+        <h3>Turning Your Fav Movie into a String of Emoticons</h3>
         <form onSubmit={onSubmit}>
           <input
             type="text"
             name="animal"
-            placeholder="Enter an animal"
-            value={animalInput}
-            onChange={(e) => setAnimalInput(e.target.value)}
+            placeholder="Enter a movie"
+            value={movieInput}
+            onChange={(e) => setMovieInput(e.target.value)}
           />
-          <input type="submit" value="Generate names" />
+          <input type="submit" value="Generate String of Emoticons" />
         </form>
-        <div className={styles.result}>{result}</div>
+        <div className='result'>{result}</div>
       </main>
     </div>
   );

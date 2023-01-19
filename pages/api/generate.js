@@ -1,7 +1,8 @@
-import { Configuration, OpenAIApi } from "openai";
+// import { Configuration, OpenAIApi } from "openai";
+ const { Configuration, OpenAIApi } = require("openai");
 
 const configuration = new Configuration({
-  apiKey: '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',
+  apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
 
@@ -15,8 +16,8 @@ export default async function (req, res) {
     return;
   }
 
-  const animal = req.body.animal || '';
-  if (animal.trim().length === 0) {
+  const movie = req.body.movie || '';
+  if (movie.trim().length === 0) {
     res.status(400).json({
       error: {
         message: "Please enter a valid animal",
@@ -24,17 +25,22 @@ export default async function (req, res) {
     });
     return;
   }
-
-  try {
+  try{
     const completion = await openai.createCompletion({
       model: "text-davinci-003",
-      prompt: generatePrompt(animal),
+      prompt: generatePrompt(movie),
       temperature: 0.6,
+      max_tokens: 60,
+      top_p: 1.0,
+      frequency_penalty: 0.0,
+      presence_penalty: 0.0,
+      stop: ["\n"],
     });
+    console.log('calling the model')
     res.status(200).json({ result: completion.data.choices[0].text });
-  } catch(error) {
-    // Consider adjusting the error handling logic for your use case
-    if (error.response) {
+    // }
+  }catch(error){
+   if (error.response) {
       console.error(error.response.status, error.response.data);
       res.status(error.response.status).json(error.response.data);
     } else {
@@ -46,17 +52,43 @@ export default async function (req, res) {
       });
     }
   }
-}
 
-function generatePrompt(animal) {
-  const capitalizedAnimal =
-    animal[0].toUpperCase() + animal.slice(1).toLowerCase();
-  return `Suggest three names for an animal that is a superhero.
 
-Animal: Cat
-Names: Captain Sharpclaw, Agent Fluffball, The Incredible Feline
-Animal: Dog
-Names: Ruff the Protector, Wonder Canine, Sir Barks-a-Lot
-Animal: ${capitalizedAnimal}
-Names:`;
+
+
+
+  // try {
+  //   const completion = await openai.createCompletion({
+  //     model: "text-davinci-003",
+  //     prompt: generatePrompt(animal),
+  //     temperature: 0.6,
+  //   });
+    // res.status(200).json({ result: completion.data.choices[0].text });
+  // } catch(error) {
+  //   // Consider adjusting the error handling logic for your use case
+  //   if (error.response) {
+  //     console.error(error.response.status, error.response.data);
+  //     res.status(error.response.status).json(error.response.data);
+  //   } else {
+  //     console.error(`Error with OpenAI API request: ${error.message}`);
+  //     res.status(500).json({
+  //       error: {
+  //         message: 'An error occurred during your request.',
+  //       }
+  //     });
+  //   }
+  // }
+// }
+function generatePrompt(movie) {
+  const capitalizedMovie =
+    movie[0].toUpperCase() + movie.slice(1).toLowerCase();
+  return `"Convert movie titles into emoji.
+  Back to the Future: 👨👴🚗🕒 
+  Batman: 🤵🦇 
+  Transformers: 🚗🤖 
+  Star Wars: 🌟⭐️⚔️ 
+  ${capitalizedMovie}: `;
+  }
+
+
 }
